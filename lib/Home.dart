@@ -8,22 +8,48 @@ class Home extends StatefulWidget {
 }
 
 class _HomeState extends State<Home> {
+
+  List _tasks = [];
+
+  void _loadListItems(){
+
+    _tasks = [];
+
+    for (int i=0; i<=2;i++){
+      Map<String, dynamic> item = Map();
+      item['title'] = 'Nova tarefa';
+
+      _tasks.add(item);
+    }
+
+  }
+
   @override
   Widget build(BuildContext context) {
+
+    _loadListItems();
+
     return Scaffold(
       appBar: AppBar(
         title: Text('Lista de Tarefas'),
         backgroundColor: Colors.purple,
       ),
 
-      body: Container(
-        padding: EdgeInsets.all(15),
-        child: Column(
-          children: <Widget>[
-            
-          ],
-        )
+      body: Column(
+        children: <Widget>[
+          Expanded(
+            child: ListView.builder(
+              itemCount: _tasks.length,
+              itemBuilder: (context, index){
+                return ListTile(
+                  title: Text(_tasks[index]['title']),
+                );
+              },
+            ),
+          )
+        ],
       ),
+      
 
       //floatingActionButtonLocation: FloatingActionButtonLocation.endDocked,
       floatingActionButton: FloatingActionButton(
@@ -41,7 +67,37 @@ class _HomeState extends State<Home> {
           size: 30,
         ),
         onPressed: (){
+          showDialog(
+            context: context,
+            builder: (context){
+              return AlertDialog(
+                title: Text('Adicionar tarefa'),
+                content: TextField(
+                  decoration: InputDecoration(
+                    labelText: 'Digite sua'
+                  ),
+                  onChanged: (addTaskTextField){
 
+                  },
+                ),
+                actions: <Widget>[
+                  TextButton( 
+                    child: Text('Salvar'),
+                    onPressed: (){
+                      // Função: WIP
+                      Navigator.pop(context);
+                    },
+                  ),
+
+                  TextButton(
+                    child: Text('Cancelar'),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+
+                ],
+              );
+            }
+          );
         },
       ),
 
