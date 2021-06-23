@@ -1,4 +1,8 @@
 import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
+import 'dart:io';
+import 'dart:async';
+import 'dart:convert';
 
 class Home extends StatefulWidget {
   const Home({ Key key }) : super(key: key);
@@ -9,25 +13,75 @@ class Home extends StatefulWidget {
 
 class _HomeState extends State<Home> {
 
-  List _tasks = [];
+  List _taskList = [];
+  TextEditingController _controllerAddTask = TextEditingController();
 
-  void _loadListItems(){
+  Future<File> _getFile() async {
 
-    _tasks = [];
+    //Acessando diretório
+    final directory = await getApplicationDocumentsDirectory();
+    return File('${directory.path}/data.json');
 
-    for (int i=0; i<=2;i++){
-      Map<String, dynamic> item = Map();
-      item['title'] = 'Nova tarefa';
+  }
 
-      _tasks.add(item);
+  _saveTask(){
+
+    String _typedText = _controllerAddTask.text;
+
+    //Criando os arquivos
+    Map <String, dynamic> task = Map();
+    task['title'] = _typedText;
+    task['status'] = false;
+
+    setState(() {
+      _taskList.add(task);    
+    });
+
+    _saveFile();
+
+    _controllerAddTask.text = '';
+
+  }
+
+  _saveFile() async {
+
+    var file = await _getFile();
+
+    //Salvando os arquivos criados
+    String data = json.encode(_taskList);
+    file.writeAsString(data);
+
+    //print('Caminho:' + directory.path );
+
+  }
+
+  _readFile() async {
+
+    try{
+
+      final file = await _getFile();
+      return file.readAsString();
+
+    } catch (error){
+
+      return null;
+
     }
 
   }
 
   @override
-  Widget build(BuildContext context) {
+    void initState() {
+      super.initState();
+      _readFile().then( (data){
+        setState(() {
+          _taskList = json.decode(data);       
+        });
+      });
+    }
 
-    _loadListItems();
+  @override
+  Widget build(BuildContext context) {
 
     return Scaffold(
       appBar: AppBar(
@@ -39,11 +93,28 @@ class _HomeState extends State<Home> {
         children: <Widget>[
           Expanded(
             child: ListView.builder(
-              itemCount: _tasks.length,
+              itemCount: _taskList.length,
               itemBuilder: (context, index){
-                return ListTile(
-                  title: Text(_tasks[index]['title']),
+
+                return CheckboxListTile(
+                  title: Text(_taskList[index]['title']),
+                  value: _taskList[index]['status'], 
+                  onChanged: (alterCheckboxValue){
+                    setState(() {
+                      _taskList[index]['status'] = alterCheckboxValue;                      
+                    });
+
+                    _saveFile();
+
+                  }
                 );
+
+                /*
+                return ListTile(
+                  title: Text(_taskList[index]['title']),
+                );
+                */
+
               },
             ),
           )
@@ -73,8 +144,9 @@ class _HomeState extends State<Home> {
               return AlertDialog(
                 title: Text('Adicionar tarefa'),
                 content: TextField(
+                  controller: _controllerAddTask,
                   decoration: InputDecoration(
-                    labelText: 'Digite sua'
+                    labelText: 'Nova tarefa'
                   ),
                   onChanged: (addTaskTextField){
 
@@ -84,7 +156,7 @@ class _HomeState extends State<Home> {
                   TextButton( 
                     child: Text('Salvar'),
                     onPressed: (){
-                      // Função: WIP
+                      _saveTask();
                       Navigator.pop(context);
                     },
                   ),
