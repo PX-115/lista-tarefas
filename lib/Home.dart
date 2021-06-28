@@ -70,6 +70,69 @@ class _HomeState extends State<Home> {
 
   }
 
+  Widget _generateList(context, index){
+
+    final taskListItem = _taskList[index]['title'];
+
+    return Dismissible(
+      key: Key(taskListItem),
+      direction: DismissDirection.endToStart,
+
+      onDismissed: (direction){
+        _taskList.removeAt(index);
+
+        _saveFile();
+      },
+
+      background: Container(
+        color: Colors.blue,
+        padding: EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.start,
+          children: <Widget>[
+            Icon(
+              Icons.edit,
+              color: Colors.white
+            )
+          ],
+        )
+      ),
+
+      secondaryBackground: Container(
+        color: Colors.red,
+        padding: EdgeInsets.all(16),
+        child: Row(
+          mainAxisAlignment: MainAxisAlignment.end,
+          children: <Widget>[
+            Icon(
+              Icons.delete,
+              color: Colors.white,
+            )
+          ],
+        ),
+      ),
+
+      child: CheckboxListTile(
+        title: Text(_taskList[index]['title']),
+        value: _taskList[index]['status'], 
+          onChanged: (alterCheckboxValue){
+            setState(() {
+              _taskList[index]['status'] = alterCheckboxValue;                      
+            });
+
+            _saveFile();
+
+          /*
+            return ListTile(
+              title: Text(_taskList[index]['title']),
+            );
+          */
+
+        }
+      )
+    );
+  }
+
   @override
     void initState() {
       super.initState();
@@ -79,6 +142,8 @@ class _HomeState extends State<Home> {
         });
       });
     }
+
+//--------------------------------------------------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -94,28 +159,7 @@ class _HomeState extends State<Home> {
           Expanded(
             child: ListView.builder(
               itemCount: _taskList.length,
-              itemBuilder: (context, index){
-
-                return CheckboxListTile(
-                  title: Text(_taskList[index]['title']),
-                  value: _taskList[index]['status'], 
-                  onChanged: (alterCheckboxValue){
-                    setState(() {
-                      _taskList[index]['status'] = alterCheckboxValue;                      
-                    });
-
-                    _saveFile();
-
-                  }
-                );
-
-                /*
-                return ListTile(
-                  title: Text(_taskList[index]['title']),
-                );
-                */
-
-              },
+              itemBuilder: _generateList
             ),
           )
         ],
