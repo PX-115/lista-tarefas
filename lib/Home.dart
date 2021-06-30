@@ -14,6 +14,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   List _taskList = [];
+  Map <String, dynamic> _lastRemovedTask = Map();
   TextEditingController _controllerAddTask = TextEditingController();
 
   Future<File> _getFile() async {
@@ -72,16 +73,65 @@ class _HomeState extends State<Home> {
 
   Widget _generateList(context, index){
 
-    final taskListItem = _taskList[index]['title'];
+    //final taskListItem = _taskList[index]['title'];
 
     return Dismissible(
-      key: Key(taskListItem),
-      direction: DismissDirection.endToStart,
+      key: Key(DateTime.now().millisecondsSinceEpoch.toString()),
+      //direction: DismissDirection.endToStart,
 
-      onDismissed: (direction){
-        _taskList.removeAt(index);
+      /*onDismissed: (startToEnd){
+        print('Assalamu alaikum');
+      },*/
 
-        _saveFile();
+      confirmDismiss: (DismissDirection endToStart) async {
+        return await showDialog(
+          context: context, 
+          builder: (BuildContext context){
+            return AlertDialog(
+              title: Text('Confirmar exclusão'),
+              content: Text('Deseja realmente excluir este item?'),
+              actions: <Widget>[
+                TextButton(
+                  child: Text('Sim'),
+                  onPressed: (){
+
+                    _lastRemovedTask = _taskList[index];
+
+                    setState(() {
+                      _taskList.removeAt(index);                 
+                    });
+
+                    _saveFile();
+
+                    Navigator.pop(context);
+
+                    final snackbar  = SnackBar(
+                      duration: Duration(seconds: 5),
+                      content: Text('Item removido'),
+                      action: SnackBarAction(
+                        label: 'Desfazer', 
+                        onPressed: (){
+                          setState(() {               
+                            _taskList.insert(index, _lastRemovedTask);
+                          });
+
+                          _saveFile();
+                        },
+                      ),
+                    );
+
+                    ScaffoldMessenger.of(context).showSnackBar(snackbar);
+                  },
+                ),
+
+                TextButton(
+                  child: Text('Não'),
+                  onPressed: () => Navigator.pop(context),
+                ),
+              ],
+            );
+          }
+        );
       },
 
       background: Container(
