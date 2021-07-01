@@ -1,9 +1,9 @@
-import 'package:flutter/material.dart';
-import 'package:lint/lint.dart';
-import 'package:path_provider/path_provider.dart';
-import 'dart:io';
 import 'dart:async';
 import 'dart:convert';
+import 'dart:io';
+
+import 'package:flutter/material.dart';
+import 'package:path_provider/path_provider.dart';
 
 class Home extends StatefulWidget {
   const Home({ Key key }) : super(key: key);
@@ -15,7 +15,7 @@ class Home extends StatefulWidget {
 class _HomeState extends State<Home> {
 
   List _taskList = [];
-  Map <String, dynamic> _lastRemovedTask = Map();
+  Map <String, dynamic> _lastRemovedTask = {};
   TextEditingController _controllerAddTask = TextEditingController();
 
   Future<File> _getFile() async {
@@ -28,10 +28,10 @@ class _HomeState extends State<Home> {
 
   _saveTask(){
 
-    String _typedText = _controllerAddTask.text;
+    final String _typedText = _controllerAddTask.text;
 
     //Criando os arquivos
-    Map <String, dynamic> task = Map();
+    final Map <String, dynamic> task = {};
     task['title'] = _typedText;
     task['status'] = false;
 
@@ -47,10 +47,10 @@ class _HomeState extends State<Home> {
 
   _saveFile() async {
 
-    var file = await _getFile();
+    final file = await _getFile();
 
     //Salvando os arquivos criados
-    String data = json.encode(_taskList);
+    final String data = json.encode(_taskList);
     file.writeAsString(data);
 
     //print('Caminho:' + directory.path );
@@ -93,7 +93,6 @@ class _HomeState extends State<Home> {
               content: Text('Deseja realmente excluir este item?'),
               actions: <Widget>[
                 TextButton(
-                  child: Text('Sim'),
                   onPressed: (){
 
                     _lastRemovedTask = _taskList[index];
@@ -123,11 +122,12 @@ class _HomeState extends State<Home> {
 
                     ScaffoldMessenger.of(context).showSnackBar(snackbar);
                   },
+                  child: Text('Sim'),
                 ),
 
                 TextButton(
-                  child: Text('Não'),
                   onPressed: () => Navigator.pop(context),
+                  child: Text('Não'),
                 ),
               ],
             );
@@ -194,7 +194,7 @@ class _HomeState extends State<Home> {
       });
     }
 
-//--------------------------------------------------------------------------------------------------------------------------
+//------------------------------------------------------------------------------
 
   @override
   Widget build(BuildContext context) {
@@ -223,15 +223,6 @@ class _HomeState extends State<Home> {
         backgroundColor: Colors.purple,
         foregroundColor: Colors.white,
         elevation: 0,
-        //icon: Icon(Icons.add),
-        //label: Text('Adicionar'),
-        /*shape: BeveledRectangleBorder(
-          borderRadius: BorderRadius.circular(3)
-        ),*/
-        child: Icon(Icons.add,
-          //color: Colors.white,
-          size: 30,
-        ),
         onPressed: (){
           showDialog(
             context: context,
@@ -248,17 +239,17 @@ class _HomeState extends State<Home> {
                   },
                 ),
                 actions: <Widget>[
-                  TextButton( 
-                    child: Text('Salvar'),
+                  TextButton(
                     onPressed: (){
                       _saveTask();
                       Navigator.pop(context);
-                    },
+                    }, 
+                    child: Text('Salvar'),
                   ),
 
                   TextButton(
-                    child: Text('Cancelar'),
                     onPressed: () => Navigator.pop(context),
+                    child: Text('Cancelar'),
                   ),
 
                 ],
@@ -266,6 +257,15 @@ class _HomeState extends State<Home> {
             }
           );
         },
+        //icon: Icon(Icons.add),
+        //label: Text('Adicionar'),
+        /*shape: BeveledRectangleBorder(
+          borderRadius: BorderRadius.circular(3)
+        ),*/
+        child: Icon(Icons.add,
+          //color: Colors.white,
+          size: 30,
+        ),
       ),
 
       /*bottomNavigationBar: BottomAppBar(
